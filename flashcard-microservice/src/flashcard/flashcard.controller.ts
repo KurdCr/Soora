@@ -19,6 +19,14 @@ import { JwtAuthGuard } from '../auth/auth.guard';
 export class FlashcardController {
   constructor(private readonly flashcardService: FlashcardService) {}
 
+  @Get('generate-shareable-link')
+  @UseGuards(JwtAuthGuard)
+  async generateShareableLink(@Req() request: Request): Promise<string> {
+    const shareableLink =
+      await this.flashcardService.generateShareableLink(request);
+    return shareableLink;
+  }
+
   @Post()
   @UsePipes(new ValidationPipe())
   @UseGuards(JwtAuthGuard)
@@ -84,14 +92,6 @@ export class FlashcardController {
   @UseGuards(JwtAuthGuard)
   async getVisibleFlashcards(@Param('userId') userId: string) {
     return this.flashcardService.getVisibleFlashcards(userId);
-  }
-
-  @Get('generate-shareable-link')
-  @UseGuards(JwtAuthGuard)
-  async generateShareableLink(@Req() request: Request): Promise<string> {
-    const shareableLink =
-      await this.flashcardService.generateShareableLink(request);
-    return shareableLink;
   }
 
   @Get('share/:hash') // This endpoint is publicly accessible, allowing anyone with the link to use it without authentication.

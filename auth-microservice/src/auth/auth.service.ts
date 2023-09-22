@@ -2,18 +2,18 @@ import {
   Injectable,
   BadRequestException,
   UnauthorizedException,
-} from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
-import { User } from './user.interface';
-import * as bcrypt from 'bcrypt';
-import { JwtService } from '@nestjs/jwt';
-import { CreateUserDto } from './user.dto';
+} from "@nestjs/common";
+import { InjectModel } from "@nestjs/mongoose";
+import { Model } from "mongoose";
+import { User } from "./user.interface";
+import * as bcrypt from "bcrypt";
+import { JwtService } from "@nestjs/jwt";
+import { CreateUserDto } from "./user.dto";
 
 @Injectable()
 export class AuthService {
   constructor(
-    @InjectModel('User') private readonly userModel: Model<User>,
+    @InjectModel("User") private readonly userModel: Model<User>,
     private readonly jwtService: JwtService,
   ) {}
 
@@ -26,7 +26,7 @@ export class AuthService {
 
     const existingUser = await this.findOne(email);
     if (existingUser) {
-      throw new BadRequestException('Email already exists');
+      throw new BadRequestException("Email already exists");
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -41,7 +41,7 @@ export class AuthService {
       return await newUser.save();
     } catch (error) {
       if (error.code === 11000) {
-        throw new BadRequestException('Email already exists');
+        throw new BadRequestException("Email already exists");
       }
       throw error;
     }
@@ -52,9 +52,8 @@ export class AuthService {
     password: string,
   ): Promise<{ access_token: string }> {
     const user = await this.findOne(email);
-    console.log('user id', user.id);
     if (!user || !(await bcrypt.compare(password, user.password))) {
-      throw new UnauthorizedException('Invalid credentials');
+      throw new UnauthorizedException("Invalid credentials");
     }
     const payload = { userId: user.id };
     const token = this.jwtService.sign(payload);

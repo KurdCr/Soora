@@ -25,6 +25,7 @@ export class FlashcardService {
 
   async generateShareableLink(@Req() request: Request) {
     const host = request.headers['host']; // Get the host (including port if available)
+    // For now, it returns `localhost:3002`, but in production environment, we could hard code the `host url` in the'.env' file
     const token = this.jwtAuthService.extractTokenFromHeader(request);
     if (!token) {
       throw new UnauthorizedException();
@@ -34,43 +35,8 @@ export class FlashcardService {
       .createHash('sha256')
       .update(userId)
       .digest('hex');
-    console.log('hashedUserId', hashedUserId);
     const shareableLink = `${host}/flashcards/share/${hashedUserId}`;
     return shareableLink;
-  }
-
-  async getFlashcardsByHash(hash: string): Promise<Flashcard[]> {
-    try {
-      // Fetch flashcards by userId
-      console.log(hash);
-      const flashcards = await this.flashcardModel
-        .find({ hashedUserId: hash })
-        .exec();
-      return flashcards;
-    } catch (error) {
-      throw new Error('Failed to fetch flashcards by user');
-    }
-  }
-
-  async getVisibleFlashcards(userId: string): Promise<Flashcard[]> {
-    try {
-      // Fetch flashcards by userId
-      const hashedUserId = crypto
-        .createHash('sha256')
-        .update(userId)
-        .digest('hex');
-      const flashcards = await this.flashcardModel
-        .find({ hashedUserId })
-        .exec();
-      const currentDate = new Date();
-      const visibleFlashcards = flashcards.filter((flashcard) => {
-        return currentDate >= flashcard.nextReviewAt;
-      });
-
-      return visibleFlashcards;
-    } catch (error) {
-      throw new Error('Failed to fetch visible flashcards');
-    }
   }
 
   async createFlashcard(
@@ -83,12 +49,10 @@ export class FlashcardService {
     }
     const { userId } = this.jwtAuthService.decodeJwt(token); // Decode the JWT and extract userId
 
-    console.log(userId);
     const hashedUserId = crypto
       .createHash('sha256')
       .update(userId)
       .digest('hex');
-    console.log(hashedUserId);
     const dtoWithHashedUserId = {
       ...createFlashcardDto,
       hashedUserId: hashedUserId,
@@ -168,5 +132,36 @@ export class FlashcardService {
 
   async getFlashcardsByAttribute(attributeId: string): Promise<any[]> {
     return this.flashcardModel.find({ attributes: attributeId }).exec();
+  }
+
+  async getFlashcardsByHash(hash: string): Promise<Flashcard[]> {
+    try {
+      const flashcards = await this.flashcardModel
+        .find({ hashedUserId: hash })
+        .exec();
+      return flashcards;
+    } catch (error) {
+      throw new Error('Failed to fetch flashcards by user');
+    }
+  }
+
+  async getVisibleFlashcards(userId: string): Promise<Flashcard[]> {
+    try {
+      const hashedUserId = crypto
+        .createHash('sha256')
+        .update(userId)
+        .digest('hex');
+      const flashcards = await this.flashcardModel
+        .find({ hashedUserId })
+        .exec();
+      const currentDate = new Date();
+      const visibleFlashcards = flashcards.filter((flashcard) => {
+        return currentDate >= flashcard.nextReviewAt;
+      });
+
+      return visibleFlashcards;
+    } catch (error) {
+      throw new Error('Failed to fetch visible flashcards');
+    }
   }
 }
