@@ -252,7 +252,7 @@ To access most of the API endpoints, you need to authenticate by including a val
 ### Get Visible Flashcards
 
 - **Endpoint**: `GET /flashcards/:userId/visible`
-- **Description**: Retrieve flashcards that are due for review based on the spaced repetition algorithm.
+- **Description**: Fetch flashcards scheduled for review according to the spaced repetition algorithm. `Updating` the flashcard `status` to one of the following options: ['again', 'easy', 'hard'] will render the flashcard invisible for [30, 60, 120] seconds, respectively.
 - **Authentication**: Required (JWT token).
 
 ## Shareable Links
