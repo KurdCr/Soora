@@ -200,7 +200,6 @@ To access most of the API endpoints, you need to authenticate by including a val
 - **Description**: Get flashcards associated with a specific attribute.
 - **Authentication**: Required (JWT token
 
-).
 
 ## Attributes
 
