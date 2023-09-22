@@ -91,7 +91,7 @@ For all API endpoints, requests to port 3000 get proxied to the intended microse
 - Auth Microservice (Port 3001)
 - Flashcards Microservice (Port 3002)
   
-  For example: localhost:3000/flashcards/generate-shareable-link
+ For example, when you make a `GET` request to `localhost:3000/flashcards/generate-shareable-link`, it will be proxied to `GET localhost:3002/flashcards/generate-shareable-link`.
 
 ## Authentication
 
